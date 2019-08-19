@@ -1,0 +1,162 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="./resources/css/ext-all.css" />
+    <script type="text/javascript" src="./adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="ext-all.js"></script>
+    <style>
+        .x-panel-body-noheader,
+        .x-panel-mc .x-panel-body {
+            border-top: 0px;
+        }
+
+        .x-panel-body {
+            border: 0px
+        }
+    </style>
+    <script type="text/javascript">
+        Ext.onReady(function () {
+            var data = {};
+            var tpl = new Ext.Template([
+                '<table border="1"><tr>',
+                '<td style="width:40px;height:20px"></td>',
+                '<td style="width:40px;height:20px"></td>',
+                '<tr>',
+                '<tr>',
+                '<td style="width:40px;height:20px"></td>',
+                '<td style="width:40px;height:20px"></td>',
+                '<tr></table>'
+            ]);
+            tpl.compile();
+            var tb = new Ext.Toolbar();
+            var menu1 = new Ext.menu.Menu({
+                items: [
+                    {
+                        text: 'Reset', listeners: {
+                            click: function () {
+                                Ext.getCmp('comment').reset()
+                            }
+                        }
+                    },
+                ]
+            });
+            var menu2 = new Ext.menu.Menu({
+                items: [
+                    {
+                        text: 'Table', listeners: {
+                            click: function () {
+                                Ext.getCmp('comment').data = data;
+                                Ext.getCmp('comment').tpl = tpl;
+                            }
+                        }
+                    },
+                ]
+            });
+            tb.add(
+                {
+                    text: 'Edit',
+                    menu: menu1
+                }, {
+                    text: 'Insert',
+                    menu: menu2
+                });
+            tb.doLayout();
+            var contextmenu = new Ext.menu.Menu({
+                items: [{
+                    text: 'Edit',
+                    menu: menu1
+                }, {
+                    text: 'Insert',
+                    menu: menu2
+                }]
+            });
+            let updateProgress = function (time) {
+                Ext.MessageBox.progress("请等待", "正在提交...");
+                return function () {
+                    if (time == 3) {
+                        Ext.MessageBox.hide();
+                        Ext.MessageBox.alert('Alert', '提交成功');
+                    } else {
+                        Ext.MessageBox.updateProgress(time / 3, '还剩' + (3 - time) + '秒');
+                    }
+                }
+            }
+
+            let commitHandler = function () {
+                if(Ext.getCmp('comment').getValue())
+                for (let i = 0; i <= 3; i++) {
+                    setTimeout(updateProgress(i), i * 1000);
+                }
+                else
+                Ext.MessageBox.alert('Alert', '回复内容不能为空哦！');
+            };
+            var panel = new Ext.Panel({
+                autoScroll: true,
+                border: false,
+                items: [
+                    {
+                        html: 'CSDN',
+                        border: false,
+                        height: 80,
+                        style: {
+                            fontSize: '40px',
+                            color: 'red'
+                        }
+                    },
+                    {
+                        html: '<h1 style="font-size:25px">深入浅出ExtJS</h1><ol style="font-size:15px"><li>1.类与事件</li><li>2.组件继承关系</li><li>...</li><li>...</li></ol>',
+                        border: false,
+                        height: 400
+                    },
+                    {
+                        items: [{
+                            height: 50,
+                            border: false,
+                            html: '<h1 style="font-size:25px">评论</h1>'
+                        }, {
+                            html: '<p style="display:inline-block">Daryl:写的很好,占个沙发</p><a id="reply" href="javascript:void(0)" >回复</a>',
+                        }, {
+                            xtype: 'form',
+                            id: 'formpanel',
+                            items: [tb, {
+                                xtype: 'textarea',
+                                border: false,
+                                id: 'comment',
+                                emptyText: '回复一波吧...(将data和tpl属性重新设置了发现template的确插进去了，但是就是显示不出来，不知道咋整了..)',
+                                height: 150,
+                                width: 400
+                            },{
+                                xtype: 'button',
+                                text: '确认回复',
+                                handler: commitHandler,
+                                style:{
+                                    float:'right',
+                                    marginRight:'80px',
+                                }
+                            }],
+                        }],
+
+                    }
+
+                ]
+            });
+            var window = new Ext.Window({
+                width: 600,
+                height: 800,
+                title: 'Google Chrome',
+                layout: 'fit',
+                items: [panel]
+            });
+            window.show();
+            Ext.get('comment').on('contextmenu', function (e) {
+                e.preventDefault();
+                contextmenu.showAt(e.getXY());
+            });
+        });
+    </script>
+</head>
+
+<body>
+</body>
+
+</html>
